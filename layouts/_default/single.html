@@ -1,38 +1,60 @@
 <!DOCTYPE html>
 <html>
 {{ partial "header.html" . }}
+
 <body>
 	<div class="container wrapper">
-		{{ partial "head.html" . }}
+		<div class="header">
+			{{ if .Site.Params.Avatar }}
+			<div class="avatar">
+				<a href="{{ .Site.BaseURL }}">
+					<img src="{{ .Site.Params.Avatar | safeURL }}" alt="{{ .Site.Title }}" />
+				</a>
+			</div>
+			{{ end }}
+			<h1 class="site-title"><a href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a></h1>
+			<div class="site-description">
+				{{- if isset .Site.Params "subtitle" -}}
+				<p>{{ .Site.Params.Subtitle | markdownify }}</p>
+				{{- end -}}
+				<nav class="nav social">
+					<ul class="flat">
+						{{- range $index, $key := .Site.Params.Social -}}
+						<li><a href="{{ $key.url }}" title="{{ $key.name }}"><i data-feather="{{ $key.icon }}"></i></a>
+						</li>
+						{{- end -}}
+						{{- if or (eq .Site.Params.mode "auto") (eq .Site.Params.mode "dark") -}}
+						<li><a href="#" class="scheme-toggle" id="scheme-toggle"></a></li>
+						{{- end -}}
+					</ul>
+				</nav>
+
+			</div>
+			<hr>
+		</div>
+
 
 		<div class="post">
 			<div class="post-header">
-				{{ if ne .Date.Year 1 }}
-					<div class="meta">
-						<div class="date">
-							<span class="day">{{ dateFormat "02" .Date }}</span>
-							<span class="rest">{{ if $.Site.Data.month }}{{ index $.Site.Data.month (printf "%d" .Date.Month) }} {{ .Date.Year }}{{ else }}{{ dateFormat "Jan 2006" .Date }}{{ end }}</span>
-						</div>
-					</div>
-				{{ end }}
+
 				<div class="matter">
 					<h1 class="title">{{ .Title }}</h1>
 				</div>
 			</div>
-					
-			<div class="markdown">
+
+			<div class="article-content">
 				{{ .Content }}
 			</div>
 
 			<div class="tags">
 				{{ if ne .Type "page" }}
-					{{ if gt .Params.tags 0 }}
-						<ul class="flat">
-							{{ range .Params.tags }}
-							<li><a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}">{{ . }}</a></li>
-							{{ end }}
-						</ul>
+				{{ if gt .Params.tags 0 }}
+				<ul class="flat">
+					{{ range .Params.tags }}
+					<li><a href="{{ " /tags/" | relLangURL }}{{ . | urlize }}">{{ . }}</a></li>
 					{{ end }}
+				</ul>
+				{{ end }}
 				{{ end }}
 			</div>
 
@@ -40,13 +62,13 @@
 			{{- $.Scratch.Set "isDisqus" true -}}
 
 			{{- if and (isset .Params "type") (in .Site.Params.disableDisqusTypes .Params.type) -}}
-				{{- $.Scratch.Set "isDisqus" false -}}
+			{{- $.Scratch.Set "isDisqus" false -}}
 			{{- end -}}
 
 			{{- if and (isset .Params "disqus") (eq .Params.disqus false) -}}
-				{{- $.Scratch.Set "isDisqus" false -}}
+			{{- $.Scratch.Set "isDisqus" false -}}
 			{{- else if and (isset .Params "disqus") (eq .Params.disqus true) -}}
-				{{- $.Scratch.Set "isDisqus" true -}}
+			{{- $.Scratch.Set "isDisqus" true -}}
 			{{- end -}}
 
 			{{- if eq ($.Scratch.Get "isDisqus") true -}}
@@ -57,4 +79,5 @@
 	</div>
 	{{ partial "footer.html" . }}
 </body>
+
 </html>
